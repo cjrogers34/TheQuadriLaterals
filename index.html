@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Quadri Laterals — 2026 Squares Game</title>
+  <meta name="description" content="10x10 squares grid for The Quadri Laterals — 2026 Squares Game." />
+
+  <!-- Optional: favicon (uses your logo). Works best if logo is square-ish. -->
+  <link rel="icon" href="logo.png" />
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111a2e;
+      --text:#eaf0ff;
+      --muted:#a9b7d6;
+      --line:rgba(255,255,255,.12);
+      --pill:rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #060a14);
+      color:var(--text);
+    }
+    header{
+      padding:16px 14px 12px;
+      position:sticky;
+      top:0;
+      background: rgba(11,18,32,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+      z-index:10;
+    }
+    .hero{
+      max-width:980px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .logo{
+      width:56px;
+      height:56px;
+      border-radius:14px;
+      object-fit:cover;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      flex:0 0 auto;
+    }
+    h1{
+      font-size:16px;
+      margin:0 0 4px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:14px 12px 28px;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:12px 0 14px;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:var(--pill);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:14px;
+      cursor:pointer;
+      touch-action: manipulation;
+    }
+    .btn:active{transform:scale(.98)}
+    .note{
+      font-size:12px;
+      color:var(--muted);
+      margin:10px 2px 0;
+      line-height:1.35;
+    }
+
+    /* Grid view */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap:7px;
+    }
+    .cell{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 6px;
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-weight:700;
+      font-size:12.5px;
+      line-height:1.1;
+      user-select:none;
+    }
+
+    /* Row view (very mobile friendly) */
+    .rows{
+      display:none;
+      gap:10px;
+      flex-direction:column;
+    }
+    .row{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+    }
+    .row h3{
+      margin:0 0 8px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .names{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .tag{
+      padding:7px 10px;
+      border-radius:999px;
+      background:var(--pill);
+      border:1px solid var(--line);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    @media (max-width:520px){
+      .logo{ width:48px; height:48px; border-radius:12px; }
+      h1{ font-size:15px; }
+      .grid{ gap:6px; }
+      .cell{
+        border-radius:12px;
+        padding:8px 6px;
+        min-height:48px;
+        font-size:12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="hero">
+      <img class="logo" src="logo.png" alt="The Quadri Laterals logo" />
+      <div>
+        <h1>The Quadri Laterals — 2026 Squares Game</h1>
+        <p class="sub">10×10 randomized squares. Each name appears 5 times.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="controls">
+      <button class="btn" id="toggleView">Switch to Row View</button>
+      <button class="btn" id="copy">Copy Rows</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="rows" id="rows"></div>
+
+    <p class="note">
+      Row View is easiest on phones. “Copy Rows” puts everything in your clipboard for texting.
+    </p>
+  </div>
+
+  <script>
+    const data = [
+      ["Matt","Sara","Jack","Audrey","Chris","Molly","Mark","Cole","Adrian","Trinity"],
+      ["Owen","Jen","Miles","Carrie","Chase","Gillian","Alan","Luke","Juliana","Carli"],
+      ["Mark","Matt","Sara","Owen","Jack","Audrey","Molly","Chris","Carrie","Cole"],
+      ["Alan","Luke","Adrian","Jen","Trinity","Miles","Gillian","Chase","Carli","Juliana"],
+      ["Sara","Mark","Owen","Matt","Molly","Jack","Audrey","Chris","Alan","Luke"],
+      ["Miles","Adrian","Jen","Trinity","Carrie","Gillian","Chase","Cole","Carli","Juliana"],
+      ["Matt","Sara","Mark","Owen","Jack","Audrey","Molly","Chris","Alan","Luke"],
+      ["Miles","Adrian","Jen","Trinity","Carrie","Gillian","Chase","Cole","Carli","Juliana"],
+      ["Matt","Sara","Mark","Owen","Jack","Audrey","Molly","Chris","Alan","Luke"],
+      ["Miles","Adrian","Jen","Trinity","Carrie","Gillian","Chase","Cole","Carli","Juliana"]
+    ];
+
+    const gridEl = document.getElementById("grid");
+    const rowsEl = document.getElementById("rows");
+    const toggleBtn = document.getElementById("toggleView");
+    const copyBtn = document.getElementById("copy");
+
+    function renderGrid(){
+      gridEl.innerHTML = "";
+      data.flat().forEach(name => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.textContent = name;
+        gridEl.appendChild(cell);
+      });
+    }
+
+    function renderRows(){
+      rowsEl.innerHTML = "";
+      data.forEach((row, i) => {
+        const wrap = document.createElement("div");
+        wrap.className = "row";
+        wrap.innerHTML = `<h3>Row ${i+1}</h3>`;
+        const names = document.createElement("div");
+        names.className = "names";
+        row.forEach(n => {
+          const t = document.createElement("div");
+          t.className = "tag";
+          t.textContent = n;
+          names.appendChild(t);
+        });
+        wrap.appendChild(names);
+        rowsEl.appendChild(wrap);
+      });
+    }
+
+    function asText(){
+      return data.map((row,i)=>`Row ${i+1}: ${row.join(" | ")}`).join("\n");
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const gridVisible = gridEl.style.display !== "none";
+      if(gridVisible){
+        gridEl.style.display = "none";
+        rowsEl.style.display = "flex";
+        toggleBtn.textContent = "Switch to Grid View";
+      } else {
+        rowsEl.style.display = "none";
+        gridEl.style.display = "grid";
+        toggleBtn.textContent = "Switch to Row View";
+      }
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(asText());
+        copyBtn.textContent = "Copied!";
+        setTimeout(()=>copyBtn.textContent="Copy Rows", 1200);
+      } catch(e){
+        alert("Copy failed. You can still select and copy manually.");
+      }
+    });
+
+    renderGrid();
+    renderRows();
+  </script>
+</body>
+</html>
